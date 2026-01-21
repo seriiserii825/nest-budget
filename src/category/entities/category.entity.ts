@@ -1,7 +1,10 @@
+import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -13,6 +16,10 @@ export class Category {
 
   @Column()
   title: string;
+
+  @ManyToOne(() => User, (user) => user.categories, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -26,14 +26,13 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Request() req: RequestWithUser): UserResponseWithoutPasswordDto {
-    return req.user;
+  login(@Request() req: RequestWithUser) {
+    return this.authService.login(req.user);
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('logout')
   logout(@Request() req) {
-    // return req.logout();
-    return { message: 'Logged out' };
+    return this.authService.logout(req.user);
   }
 }

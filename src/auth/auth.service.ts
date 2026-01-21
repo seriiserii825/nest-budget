@@ -6,12 +6,15 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import * as argon2 from 'argon2';
 import { UserResponseWithoutPasswordDto } from 'src/user/dto/user-response-dto';
 import { UserService } from 'src/user/user.service';
+import { JwtService } from '@nestjs/jwt';
+import { IUserJwtPayload } from './interfaces/IUserJwtPayload';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UserService,
     @InjectRepository(User) private userRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
 
   async create(
@@ -56,5 +59,18 @@ export class AuthService {
     return this.userRepository
       .count({ where: { email } })
       .then((count) => count > 0);
+  }
+
+  login(user: UserResponseWithoutPasswordDto) {
+    const payload: IUserJwtPayload = { email: user.email, sub: user.id };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+
+  logout(user: UserResponseWithoutPasswordDto) {
+    return {
+      message: `User with email ${user.email} logged out successfully`,
+    };
   }
 }

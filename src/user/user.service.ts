@@ -10,8 +10,9 @@ export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
+
   findAll() {
-    return `This action returns all user`;
+    return this.userRepository.find();
   }
 
   async findOne(email: string): Promise<UserResponseDto | undefined> {

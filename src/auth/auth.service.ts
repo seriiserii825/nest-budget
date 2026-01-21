@@ -5,6 +5,7 @@ import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import * as argon2 from 'argon2';
+import { UserResponseDto } from 'src/user/dto/user-response-dto';
 
 @Injectable()
 export class AuthService {
@@ -12,9 +13,7 @@ export class AuthService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
-  async create(
-    createUserDto: CreateUserDto,
-  ): Promise<Pick<User, 'id' | 'email' | 'createdAt' | 'updatedAt'>> {
+  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const user_exists = await this.isUserExists(createUserDto.email);
     if (user_exists) {
       throw new ConflictException('User with this email already exists');

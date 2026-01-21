@@ -1,20 +1,8 @@
 // src/common/decorators/api-user-response.decorator.ts
 import { applyDecorators } from '@nestjs/common';
-import { ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
-import { User } from 'src/user/entities/user.entity';
-import { userResponseExample } from 'src/user/examples/user-response.example';
+import { ApiOkResponse } from '@nestjs/swagger';
+import { UserResponseDto } from 'src/user/dto/user-response-dto';
 
 export function ApiUserResponse() {
-  return applyDecorators(
-    ApiOkResponse({
-      schema: {
-        allOf: [
-          { $ref: getSchemaPath(User) },
-          {
-            example: userResponseExample,
-          },
-        ],
-      },
-    }),
-  );
+  return applyDecorators(ApiOkResponse({ type: UserResponseDto }));
 }

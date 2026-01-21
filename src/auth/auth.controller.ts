@@ -12,7 +12,7 @@ import { UpdateAuthDto } from './dto/update-auth.dto';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { ApiBody } from '@nestjs/swagger';
 import { ApiUserResponse } from 'src/common/decorators/api-user-response.decorator';
-import { User } from 'src/user/entities/user.entity';
+import { UserResponseDto } from 'src/user/dto/user-response-dto';
 
 @Controller('auth')
 export class AuthController {
@@ -21,7 +21,7 @@ export class AuthController {
   @ApiBody({ type: CreateUserDto })
   @ApiUserResponse()
   @Post('register')
-  create(@Body() createUserDto: CreateUserDto): Promise<User> {
+  create(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
     return this.authService.create(createUserDto);
   }
 

@@ -7,6 +7,9 @@ export class UserFullResponseDto {
   @ApiProperty({ example: 'user@mail.com' })
   email: string;
 
+  @ApiProperty({ example: 'hashed_password_string' })
+  password: string;
+
   @ApiProperty({
     example: '2024-01-01T00:00:00.000Z',
     type: String,
@@ -28,6 +31,12 @@ export class UserFullResponseDto {
 export class UserResponseDto extends PickType(UserFullResponseDto, [
   'id',
   'email',
+  'password',
   'createdAt',
   'updatedAt',
 ] as const) {}
+
+export class UserResponseWithoutPasswordDto extends PickType(
+  UserFullResponseDto,
+  ['id', 'email', 'createdAt', 'updatedAt'] as const,
+) {}

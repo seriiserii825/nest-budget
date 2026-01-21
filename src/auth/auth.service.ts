@@ -1,19 +1,22 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import * as argon2 from 'argon2';
-import { UserResponseDto } from 'src/user/dto/user-response-dto';
+import { UserResponseWithoutPasswordDto } from 'src/user/dto/user-response-dto';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private usersService: UserService,
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
+  async create(
+    createUserDto: CreateUserDto,
+  ): Promise<UserResponseWithoutPasswordDto> {
     const user_exists = await this.isUserExists(createUserDto.email);
     if (user_exists) {
       throw new ConflictException('User with this email already exists');
@@ -32,25 +35,26 @@ export class AuthService {
     };
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<UserResponseWithoutPasswordDto | null> {
+    const user = await this.usersService.findOne(email);
+    if (!user) {
+      return null;
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+    const passwordsIsMatch = await argon2.verify(user.password, password);
+
+    if (user && passwordsIsMatch) {
+      return user;
+    }
+    return null;
   }
 
   async isUserExists(email: string): Promise<boolean> {
     return this.userRepository
       .count({ where: { email } })
       .then((count) => count > 0);
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
   }
 }

@@ -1,11 +1,23 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { UpdateAuthDto } from './dto/update-auth.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/user/entities/user.entity';
+import { Repository } from 'typeorm';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    @InjectRepository(User) private userRepository: Repository<User>,
+  ) {}
+
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const user_exists = await this.isUserExists(createUserDto.email);
+    if (user_exists) {
+      throw new ConflictException('User with this email already exists');
+    }
+    const user = this.userRepository.create(createUserDto);
+    return this.userRepository.save(user);
   }
 
   findAll() {
@@ -14,6 +26,12 @@ export class AuthService {
 
   findOne(id: number) {
     return `This action returns a #${id} auth`;
+  }
+
+  async isUserExists(email: string): Promise<boolean> {
+    return this.userRepository
+      .count({ where: { email } })
+      .then((count) => count > 0);
   }
 
   update(id: number, updateAuthDto: UpdateAuthDto) {

@@ -24,7 +24,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         synchronize: configService.get('NODE_ENV') === 'development',
         // Для production используйте миграции
         migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
-        migrationsRun: true, // Автоматически запускать миграции
+        migrationsRun: false, // Автоматически запускать миграции
       }),
       inject: [ConfigService],
     }),

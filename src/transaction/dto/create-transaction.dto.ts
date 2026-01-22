@@ -68,21 +68,28 @@ export class CreateTransactionDto extends PickType(TransactionResponseDto, [
   'categoryId',
 ] as const) {}
 
+class PaginationMetaDto {
+  @ApiProperty({ example: 1, description: 'Current page number' })
+  @IsNumber()
+  page: number;
+
+  @ApiProperty({ example: 10, description: 'Number of items per page' })
+  @IsNumber()
+  limit: number;
+
+  @ApiProperty({ example: 100, description: 'Total number of items' })
+  @IsNumber()
+  total: number;
+
+  @ApiProperty({ example: 10, description: 'Total number of pages' })
+  @IsNumber()
+  totalPages: number;
+}
+
 export class PaginatedTransactionResponseDto {
   @ApiProperty({ type: [TransactionResponseDto] })
   data: TransactionResponseDto[];
-
-  @ApiProperty({ example: 1, description: 'Current page' })
-  page: number;
-
-  @ApiProperty({ example: 10, description: 'Items per page' })
-  limit: number;
-
-  @ApiProperty({ example: 100, description: 'Total items' })
-  total: number;
-
-  @ApiProperty({ example: 10, description: 'Total pages' })
-  totalPages: number;
+  meta: PaginationMetaDto;
 }
 
 export class SummaryResponseDto {

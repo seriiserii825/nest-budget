@@ -1,23 +1,37 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
 } from '@nestjs/common';
-import { TransactionService } from './transaction.service';
-import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { ApiBody, ApiOkResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import {
+  CreateTransactionDto,
+  TransactionResponseDto,
+} from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { TransactionService } from './transaction.service';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import type { IUserFromJwt } from 'src/auth/interfaces/IRequestWithUser';
 
-@Controller('transaction')
+@UseGuards(JwtAuthGuard)
+@Controller('transactions')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
+  @ApiOkResponse({ type: TransactionResponseDto })
+  @ApiBody({ type: CreateTransactionDto })
   @Post()
-  create(@Body() createTransactionDto: CreateTransactionDto) {
-    return this.transactionService.create(createTransactionDto);
+  create(
+    @CurrentUser() user: IUserFromJwt,
+    @Body() createTransactionDto: CreateTransactionDto,
+  ) {
+    return this.transactionService.create(createTransactionDto, user.userId);
   }
 
   @Get()
@@ -25,9 +39,10 @@ export class TransactionController {
     return this.transactionService.findAll();
   }
 
+  @ApiOkResponse({ type: TransactionResponseDto })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.transactionService.findOne(+id);
+  findOne(@CurrentUser() user: IUserFromJwt, @Param('id') id: string) {
+    return this.transactionService.findOne(+id, user.userId);
   }
 
   @Patch(':id')

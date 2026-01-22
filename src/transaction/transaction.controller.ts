@@ -34,13 +34,18 @@ export class TransactionController {
     return this.transactionService.create(createTransactionDto, user.userId);
   }
 
-  @ApiOkResponse({ type: [TransactionResponseDto] })
+  @ApiOkResponse({ type: PaginatedTransactionResponseDto })
   @Get()
   findAll(
     @CurrentUser() user: IUserFromJwt,
     @Query() paginationQuery: PaginationQueryDto,
   ): Promise<PaginatedTransactionResponseDto> {
     return this.transactionService.findAll(user.userId, paginationQuery);
+  }
+
+  @Get('summary')
+  summary(@CurrentUser() user: IUserFromJwt) {
+    return this.transactionService.summary(user.userId);
   }
 
   @ApiOkResponse({ type: TransactionResponseDto })

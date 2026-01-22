@@ -105,4 +105,26 @@ export class TransactionService {
       throw new ConflictException('Transaction with this title already exists');
     }
   }
+
+  async summary(userId: number) {
+    const transactions = await this.transactionRepository.find({
+      where: { user: { id: userId } },
+    });
+
+    const summary = transactions.reduce(
+      (acc, transaction) => {
+        if (transaction.type === 'income') {
+          acc.totalIncome += transaction.amount;
+        } else if (transaction.type === 'expense') {
+          acc.totalExpense += transaction.amount;
+        }
+        return acc;
+      },
+      { totalIncome: 0, totalExpense: 0 },
+    );
+
+    summary['netBalance'] = summary.totalIncome - summary.totalExpense;
+
+    return summary;
+  }
 }

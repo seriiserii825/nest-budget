@@ -1,12 +1,13 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/user/entities/user.entity';
-import { Repository } from 'typeorm';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import * as argon2 from 'argon2';
-import { UserResponseWithoutPasswordDto } from 'src/user/dto/user-response-dto';
-import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as argon2 from 'argon2';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { UserResponseWithoutPasswordDto } from 'src/user/dto/user-response-dto';
+import { User } from 'src/user/entities/user.entity';
+import { UserService } from 'src/user/user.service';
+import { Repository } from 'typeorm';
+import { IUserFromJwt } from './interfaces/IRequestWithUser';
 import { IUserJwtPayload } from './interfaces/IUserJwtPayload';
 
 @Injectable()
@@ -64,11 +65,12 @@ export class AuthService {
   login(user: UserResponseWithoutPasswordDto) {
     const payload: IUserJwtPayload = { email: user.email, sub: user.id };
     return {
+      user: user,
       access_token: this.jwtService.sign(payload),
     };
   }
 
-  logout(user: UserResponseWithoutPasswordDto) {
+  logout(user: IUserFromJwt) {
     return {
       message: `User with email ${user.email} logged out successfully`,
     };

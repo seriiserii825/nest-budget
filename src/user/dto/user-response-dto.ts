@@ -40,3 +40,16 @@ export class UserResponseWithoutPasswordDto extends PickType(
   UserFullResponseDto,
   ['id', 'email', 'createdAt', 'updatedAt'] as const,
 ) {}
+
+export class LoginResponseDto {
+  @ApiProperty({ example: 'jwt_token_string' })
+  accessToken: string;
+
+  @ApiProperty({ type: UserResponseWithoutPasswordDto })
+  user: UserResponseWithoutPasswordDto;
+}
+
+export class LogoutResponseDto {
+  @ApiProperty({ example: 'Successfully logged out' })
+  message: string;
+}

@@ -1,6 +1,6 @@
-import { ApiProperty, PickType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class CategoryDto {
+export class ResponseCategoryDto {
   @ApiProperty({ example: 1, description: 'The ID of the category' })
   id: number;
   @ApiProperty({
@@ -19,7 +19,3 @@ export class CategoryDto {
   })
   updatedAt: Date;
 }
-
-export class CreateCategoryDto extends PickType(CategoryDto, [
-  'title',
-] as const) {}

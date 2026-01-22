@@ -54,6 +54,7 @@ export class TransactionService {
   async findOne(id: number, userId: number): Promise<TransactionResponseDto> {
     const transaction = await this.transactionRepository.findOne({
       where: { id, user: { id: userId } },
+      relations: ['user', 'category'],
     });
     if (!transaction) {
       throw new NotFoundException('Transaction not found');

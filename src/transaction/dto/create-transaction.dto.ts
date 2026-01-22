@@ -84,3 +84,11 @@ export class PaginatedTransactionResponseDto {
   @ApiProperty({ example: 10, description: 'Total pages' })
   totalPages: number;
 }
+
+export class SummaryResponseDto {
+  @ApiProperty({ example: 15000, description: 'Total income amount' })
+  income: number;
+
+  @ApiProperty({ example: 5000, description: 'Total expense amount' })
+  expense: number;
+}

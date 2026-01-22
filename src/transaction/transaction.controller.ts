@@ -15,6 +15,7 @@ import { PaginationQueryDto } from 'src/common/dto/pagination.dto';
 import {
   CreateTransactionDto,
   PaginatedTransactionResponseDto,
+  SummaryResponseDto,
   TransactionResponseDto,
 } from './dto/create-transaction.dto';
 import { TransactionService } from './transaction.service';
@@ -43,8 +44,9 @@ export class TransactionController {
     return this.transactionService.findAll(user.userId, paginationQuery);
   }
 
+  @ApiOkResponse({ type: SummaryResponseDto })
   @Get('summary')
-  summary(@CurrentUser() user: IUserFromJwt) {
+  summary(@CurrentUser() user: IUserFromJwt): Promise<SummaryResponseDto> {
     return this.transactionService.summary(user.userId);
   }
 

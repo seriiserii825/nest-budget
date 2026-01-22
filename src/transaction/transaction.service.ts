@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import {
   CreateTransactionDto,
   PaginatedTransactionResponseDto,
+  SummaryResponseDto,
   TransactionResponseDto,
 } from './dto/create-transaction.dto';
 import { Transaction } from './entities/transaction.entity';
@@ -106,7 +107,7 @@ export class TransactionService {
     }
   }
 
-  async summary(userId: number) {
+  async summary(userId: number): Promise<SummaryResponseDto> {
     const transactions = await this.transactionRepository.find({
       where: { user: { id: userId } },
     });
@@ -114,16 +115,14 @@ export class TransactionService {
     const summary = transactions.reduce(
       (acc, transaction) => {
         if (transaction.type === 'income') {
-          acc.totalIncome += transaction.amount;
+          acc.income += transaction.amount;
         } else if (transaction.type === 'expense') {
-          acc.totalExpense += transaction.amount;
+          acc.expense += transaction.amount;
         }
         return acc;
       },
-      { totalIncome: 0, totalExpense: 0 },
+      { income: 0, expense: 0 },
     );
-
-    summary['netBalance'] = summary.totalIncome - summary.totalExpense;
 
     return summary;
   }

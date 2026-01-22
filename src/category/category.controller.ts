@@ -31,22 +31,27 @@ export class CategoryController {
     return this.categoryService.create(createCategoryDto, user.userId);
   }
 
+  @ApiOkResponse({ type: [CategoryDto] })
   @Get()
-  findAll() {
-    return this.categoryService.findAll();
+  findAll(@CurrentUser() user: IUserFromJwt): Promise<CategoryDto[]> {
+    return this.categoryService.findAll(user.userId);
   }
 
+  @ApiOkResponse({ type: CategoryDto })
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string): Promise<CategoryDto> {
     return this.categoryService.findOne(+id);
   }
 
+  @ApiBody({ type: UpdateCategoryDto })
+  @ApiOkResponse({ type: CategoryDto })
   @Patch(':id')
   update(
+    @CurrentUser() user: IUserFromJwt,
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
-  ) {
-    return this.categoryService.update(+id, updateCategoryDto);
+  ): Promise<CategoryDto> {
+    return this.categoryService.update(+id, updateCategoryDto, user.userId);
   }
 
   @Delete(':id')

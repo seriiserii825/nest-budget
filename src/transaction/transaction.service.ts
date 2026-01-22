@@ -3,7 +3,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateTransactionDto } from './dto/create-transaction.dto';
+import {
+  CreateTransactionDto,
+  TransactionResponseDto,
+} from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Transaction } from './entities/transaction.entity';
@@ -16,7 +19,10 @@ export class TransactionService {
     private transactionRepository: Repository<Transaction>,
   ) {}
 
-  async create(createTransactionDto: CreateTransactionDto, userId: number) {
+  async create(
+    createTransactionDto: CreateTransactionDto,
+    userId: number,
+  ): Promise<TransactionResponseDto> {
     await this.entityWithTitleExists(userId, createTransactionDto.title);
     const transaction = this.transactionRepository.create({
       title: createTransactionDto.title,
@@ -25,21 +31,38 @@ export class TransactionService {
       user: { id: userId },
       category: { id: createTransactionDto.categoryId }, // Map categoryId to category object
     });
-    return this.transactionRepository.save(transaction);
+    const savedTransaction = await this.transactionRepository.save(transaction);
+    return {
+      ...savedTransaction,
+      categoryId: savedTransaction.category.id,
+      userId: savedTransaction.user.id,
+    };
   }
 
-  findAll() {
-    return `This action returns all transaction`;
+  async findAll(userId: number): Promise<TransactionResponseDto[]> {
+    const transactions = await this.transactionRepository.find({
+      where: { user: { id: userId } },
+      relations: ['user', 'category'],
+    });
+    return transactions.map((transaction) => ({
+      ...transaction,
+      categoryId: transaction.category.id,
+      userId: transaction.user.id,
+    }));
   }
 
-  async findOne(id: number, userId: number) {
+  async findOne(id: number, userId: number): Promise<TransactionResponseDto> {
     const transaction = await this.transactionRepository.findOne({
       where: { id, user: { id: userId } },
     });
     if (!transaction) {
       throw new NotFoundException('Transaction not found');
     }
-    return transaction;
+    return {
+      ...transaction,
+      categoryId: transaction.category.id,
+      userId: transaction.user.id,
+    };
   }
 
   update(id: number, updateTransactionDto: UpdateTransactionDto) {

@@ -30,18 +30,24 @@ export class TransactionController {
   create(
     @CurrentUser() user: IUserFromJwt,
     @Body() createTransactionDto: CreateTransactionDto,
-  ) {
+  ): Promise<TransactionResponseDto> {
     return this.transactionService.create(createTransactionDto, user.userId);
   }
 
+  @ApiOkResponse({ type: [TransactionResponseDto] })
   @Get()
-  findAll() {
-    return this.transactionService.findAll();
+  findAll(
+    @CurrentUser() user: IUserFromJwt,
+  ): Promise<TransactionResponseDto[]> {
+    return this.transactionService.findAll(user.userId);
   }
 
   @ApiOkResponse({ type: TransactionResponseDto })
   @Get(':id')
-  findOne(@CurrentUser() user: IUserFromJwt, @Param('id') id: string) {
+  findOne(
+    @CurrentUser() user: IUserFromJwt,
+    @Param('id') id: string,
+  ): Promise<TransactionResponseDto> {
     return this.transactionService.findOne(+id, user.userId);
   }
 

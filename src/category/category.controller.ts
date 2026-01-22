@@ -14,7 +14,7 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import type { IUserFromJwt } from 'src/auth/interfaces/IRequestWithUser';
-import { ApiBody, ApiOkResponse } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiParam } from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard)
 @Controller('categories')
@@ -54,8 +54,10 @@ export class CategoryController {
     return this.categoryService.update(+id, updateCategoryDto, user.userId);
   }
 
+  @ApiParam({ name: 'id', type: 'string' })
+  @ApiOkResponse({ type: CategoryDto })
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string): Promise<CategoryDto> {
     return this.categoryService.remove(+id);
   }
 }

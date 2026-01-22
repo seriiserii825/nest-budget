@@ -67,8 +67,10 @@ export class CategoryService {
     return this.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async remove(id: number): Promise<CategoryDto> {
+    const category = await this.findOne(id);
+    await this.categoryRepository.delete(id);
+    return category;
   }
 
   async categoryExists(user_id: number, title: string): Promise<void> {

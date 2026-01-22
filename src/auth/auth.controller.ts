@@ -1,28 +1,25 @@
 import {
-  Controller,
-  Post,
   Body,
-  UseGuards,
-  Request,
+  Controller,
   Get,
+  Post,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { ApiBody, ApiOkResponse } from '@nestjs/swagger';
 import { ApiUserResponse } from 'src/common/decorators/api-user-response.decorator';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import {
   LoginResponseDto,
   LogoutResponseDto,
   UserResponseWithoutPasswordDto,
 } from 'src/user/dto/user-response-dto';
-import { LocalAuthGuard } from './guards/local-auth.guard';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import type {
-  IRequestWithUser,
-  IUserFromJwt,
-} from './interfaces/IRequestWithUser';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { CreateAuthDto } from './dto/create-auth.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { LocalAuthGuard } from './guards/local-auth.guard';
+import type { IUserFromJwt } from './interfaces/IRequestWithUser';
 
 interface RequestWithUser extends Request {
   user: UserResponseWithoutPasswordDto;

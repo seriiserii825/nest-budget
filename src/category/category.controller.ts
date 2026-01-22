@@ -39,8 +39,11 @@ export class CategoryController {
 
   @ApiOkResponse({ type: CategoryDto })
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<CategoryDto> {
-    return this.categoryService.findOne(+id);
+  findOne(
+    @CurrentUser() user: IUserFromJwt,
+    @Param('id') id: string,
+  ): Promise<CategoryDto> {
+    return this.categoryService.findOne(+id, user.userId);
   }
 
   @ApiBody({ type: UpdateCategoryDto })
@@ -57,7 +60,10 @@ export class CategoryController {
   @ApiParam({ name: 'id', type: 'string' })
   @ApiOkResponse({ type: CategoryDto })
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<CategoryDto> {
-    return this.categoryService.remove(+id);
+  remove(
+    @CurrentUser() user: IUserFromJwt,
+    @Param('id') id: string,
+  ): Promise<CategoryDto> {
+    return this.categoryService.remove(+id, user.userId);
   }
 }

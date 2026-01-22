@@ -20,7 +20,7 @@ export class CategoryService {
     createCategoryDto: CreateCategoryDto,
     userId: number,
   ): Promise<CategoryDto> {
-    await this.categoryExists(userId, createCategoryDto.title);
+    await this.categoryWithTitleExists(userId, createCategoryDto.title);
     const category = this.categoryRepository.create({
       ...createCategoryDto,
       user: { id: userId },
@@ -38,9 +38,9 @@ export class CategoryService {
     });
   }
 
-  async findOne(id: number): Promise<CategoryDto> {
+  async findOne(id: number, user_id: number): Promise<CategoryDto> {
     const category = await this.categoryRepository.findOne({
-      where: { id },
+      where: { id, user: { id: user_id } },
     });
     if (!category) {
       throw new NotFoundException('Category not found');
@@ -54,7 +54,8 @@ export class CategoryService {
     user_id: number,
   ): Promise<CategoryDto> {
     if (updateCategoryDto.title) {
-      await this.categoryExists(user_id, updateCategoryDto.title);
+      await this.findOne(id, user_id);
+      await this.categoryWithTitleExists(user_id, updateCategoryDto.title);
       const category = await this.categoryRepository.preload({
         id,
         ...updateCategoryDto,
@@ -64,16 +65,16 @@ export class CategoryService {
       }
       return this.categoryRepository.save(category);
     }
-    return this.findOne(id);
+    return this.findOne(id, user_id);
   }
 
-  async remove(id: number): Promise<CategoryDto> {
-    const category = await this.findOne(id);
+  async remove(id: number, user_id: number): Promise<CategoryDto> {
+    const category = await this.findOne(id, user_id);
     await this.categoryRepository.delete(id);
     return category;
   }
 
-  async categoryExists(user_id: number, title: string): Promise<void> {
+  async categoryWithTitleExists(user_id: number, title: string): Promise<void> {
     const category = await this.categoryRepository.findOne({
       where: {
         user: {

@@ -3,14 +3,15 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import {
   CreateTransactionDto,
+  PaginatedTransactionResponseDto,
   TransactionResponseDto,
 } from './dto/create-transaction.dto';
-import { UpdateTransactionDto } from './dto/update-transaction.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Transaction } from './entities/transaction.entity';
-import { Repository } from 'typeorm';
+import { PaginationQueryDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class TransactionService {
@@ -39,16 +40,41 @@ export class TransactionService {
     };
   }
 
-  async findAll(userId: number): Promise<TransactionResponseDto[]> {
-    const transactions = await this.transactionRepository.find({
-      where: { user: { id: userId } },
-      relations: ['user', 'category'],
-    });
-    return transactions.map((transaction) => ({
-      ...transaction,
+  async findAll(
+    userId: number,
+    paginationQuery: PaginationQueryDto,
+  ): Promise<PaginatedTransactionResponseDto> {
+    const { page = 1, limit = 10 } = paginationQuery;
+    const skip = (page - 1) * limit;
+
+    const [transactions, total] = await this.transactionRepository.findAndCount(
+      {
+        where: { user: { id: userId } },
+        relations: ['user', 'category'],
+        skip,
+        take: limit,
+        order: { createdAt: 'DESC' }, // Optional: order by newest first
+      },
+    );
+
+    const data = transactions.map((transaction) => ({
+      id: transaction.id,
+      title: transaction.title,
+      type: transaction.type,
+      amount: transaction.amount,
       categoryId: transaction.category.id,
       userId: transaction.user.id,
+      createdAt: transaction.createdAt,
+      updatedAt: transaction.updatedAt,
     }));
+
+    return {
+      data,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async findOne(id: number, userId: number): Promise<TransactionResponseDto> {
@@ -64,14 +90,6 @@ export class TransactionService {
       categoryId: transaction.category.id,
       userId: transaction.user.id,
     };
-  }
-
-  update(id: number, updateTransactionDto: UpdateTransactionDto) {
-    return `This action updates a #${id} transaction`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} transaction`;
   }
 
   async entityWithTitleExists(user_id: number, title: string): Promise<void> {

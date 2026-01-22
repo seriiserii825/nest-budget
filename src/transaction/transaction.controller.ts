@@ -1,23 +1,23 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
-  Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBody, ApiOkResponse } from '@nestjs/swagger';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import type { IUserFromJwt } from 'src/auth/interfaces/IRequestWithUser';
+import { PaginationQueryDto } from 'src/common/dto/pagination.dto';
 import {
   CreateTransactionDto,
+  PaginatedTransactionResponseDto,
   TransactionResponseDto,
 } from './dto/create-transaction.dto';
-import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { TransactionService } from './transaction.service';
-import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
-import type { IUserFromJwt } from 'src/auth/interfaces/IRequestWithUser';
 
 @UseGuards(JwtAuthGuard)
 @Controller('transactions')
@@ -38,8 +38,9 @@ export class TransactionController {
   @Get()
   findAll(
     @CurrentUser() user: IUserFromJwt,
-  ): Promise<TransactionResponseDto[]> {
-    return this.transactionService.findAll(user.userId);
+    @Query() paginationQuery: PaginationQueryDto,
+  ): Promise<PaginatedTransactionResponseDto> {
+    return this.transactionService.findAll(user.userId, paginationQuery);
   }
 
   @ApiOkResponse({ type: TransactionResponseDto })
@@ -49,18 +50,5 @@ export class TransactionController {
     @Param('id') id: string,
   ): Promise<TransactionResponseDto> {
     return this.transactionService.findOne(+id, user.userId);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateTransactionDto: UpdateTransactionDto,
-  ) {
-    return this.transactionService.update(+id, updateTransactionDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.transactionService.remove(+id);
   }
 }

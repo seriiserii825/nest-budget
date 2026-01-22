@@ -67,3 +67,20 @@ export class CreateTransactionDto extends PickType(TransactionResponseDto, [
   'amount',
   'categoryId',
 ] as const) {}
+
+export class PaginatedTransactionResponseDto {
+  @ApiProperty({ type: [TransactionResponseDto] })
+  data: TransactionResponseDto[];
+
+  @ApiProperty({ example: 1, description: 'Current page' })
+  page: number;
+
+  @ApiProperty({ example: 10, description: 'Items per page' })
+  limit: number;
+
+  @ApiProperty({ example: 100, description: 'Total items' })
+  total: number;
+
+  @ApiProperty({ example: 10, description: 'Total pages' })
+  totalPages: number;
+}

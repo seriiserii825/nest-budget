@@ -1,5 +1,7 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { IsEnum, IsNumber, IsString } from 'class-validator';
+import { CategoryDto } from 'src/category/dto/create-category.dto';
+import { UserResponseDto } from 'src/user/dto/user-response-dto';
 
 enum TransactionType {
   INCOME = 'income',
@@ -33,18 +35,19 @@ export class TransactionResponseDto {
   amount: number;
 
   @ApiProperty({
-    example: 1,
-    description: 'The ID of the user associated with the transaction',
+    example: {
+      id: 1,
+      username: 'johndoe',
+      email: 'user@mail.com',
+    },
   })
-  @IsNumber()
-  userId: number;
+  user: UserResponseDto;
 
   @ApiProperty({
     example: 2,
     description: 'The ID of the category associated with the transaction',
   })
-  @IsNumber()
-  categoryId: number;
+  category: CategoryDto;
 
   @ApiProperty({
     example: '2024-01-01T00:00:00Z',
@@ -65,7 +68,7 @@ export class CreateTransactionDto extends PickType(TransactionResponseDto, [
   'title',
   'type',
   'amount',
-  'categoryId',
+  'category',
 ] as const) {}
 
 class PaginationMetaDto {

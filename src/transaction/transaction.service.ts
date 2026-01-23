@@ -30,15 +30,9 @@ export class TransactionService {
       title: createTransactionDto.title,
       type: createTransactionDto.type,
       amount: createTransactionDto.amount,
-      user: { id: userId },
-      category: { id: createTransactionDto.categoryId }, // Map categoryId to category object
     });
     const savedTransaction = await this.transactionRepository.save(transaction);
-    return {
-      ...savedTransaction,
-      categoryId: savedTransaction.category.id,
-      userId: savedTransaction.user.id,
-    };
+    return savedTransaction;
   }
 
   async findAll(
@@ -63,8 +57,8 @@ export class TransactionService {
       title: transaction.title,
       type: transaction.type,
       amount: transaction.amount,
-      categoryId: transaction.category.id,
-      userId: transaction.user.id,
+      category: transaction.category,
+      user: transaction.user,
       createdAt: transaction.createdAt,
       updatedAt: transaction.updatedAt,
     }));
@@ -89,11 +83,7 @@ export class TransactionService {
       take: 3,
       order: { createdAt: 'DESC' },
     });
-    return transactions.map((transaction) => ({
-      ...transaction,
-      categoryId: transaction.category.id,
-      userId: transaction.user.id,
-    }));
+    return transactions;
   }
 
   async findOne(id: number, userId: number): Promise<TransactionResponseDto> {
@@ -104,11 +94,7 @@ export class TransactionService {
     if (!transaction) {
       throw new NotFoundException('Transaction not found');
     }
-    return {
-      ...transaction,
-      categoryId: transaction.category.id,
-      userId: transaction.user.id,
-    };
+    return transaction;
   }
 
   async entityWithTitleExists(user_id: number, title: string): Promise<void> {

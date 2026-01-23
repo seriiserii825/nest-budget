@@ -44,6 +44,14 @@ export class TransactionController {
     return this.transactionService.findAll(user.userId, paginationQuery);
   }
 
+  @ApiOkResponse({ type: PaginatedTransactionResponseDto })
+  @Get('recent')
+  findRecent(
+    @CurrentUser() user: IUserFromJwt,
+  ): Promise<TransactionResponseDto[]> {
+    return this.transactionService.findRecent(user.userId);
+  }
+
   @ApiOkResponse({ type: SummaryResponseDto })
   @Get('summary')
   summary(@CurrentUser() user: IUserFromJwt): Promise<SummaryResponseDto> {

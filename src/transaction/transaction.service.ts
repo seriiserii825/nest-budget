@@ -80,6 +80,22 @@ export class TransactionService {
     };
   }
 
+  async findRecent(userId: number): Promise<TransactionResponseDto[]> {
+    const transactions = await this.transactionRepository.find({
+      where: {
+        user: { id: userId },
+      },
+      relations: ['user', 'category'],
+      take: 3,
+      order: { createdAt: 'DESC' },
+    });
+    return transactions.map((transaction) => ({
+      ...transaction,
+      categoryId: transaction.category.id,
+      userId: transaction.user.id,
+    }));
+  }
+
   async findOne(id: number, userId: number): Promise<TransactionResponseDto> {
     const transaction = await this.transactionRepository.findOne({
       where: { id, user: { id: userId } },

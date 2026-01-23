@@ -30,6 +30,8 @@ export class TransactionService {
       title: createTransactionDto.title,
       type: createTransactionDto.type,
       amount: createTransactionDto.amount,
+      category: { id: createTransactionDto.category },
+      user: { id: userId },
     });
     const savedTransaction = await this.transactionRepository.save(transaction);
     return savedTransaction;

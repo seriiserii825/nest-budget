@@ -69,12 +69,35 @@ export class TransactionWithoutRelationsDto extends OmitType(
   ['user', 'category'] as const,
 ) {}
 
-export class CreateTransactionDto extends PickType(TransactionResponseDto, [
-  'title',
-  'type',
-  'amount',
-  'category',
-] as const) {}
+export class CreateTransactionDto {
+  @ApiProperty({
+    example: 'Salary',
+    description: 'The title of the transaction',
+  })
+  @IsString()
+  title: string;
+
+  @ApiProperty({
+    example: 'income',
+    description: 'The type of the transaction, income or expense',
+  })
+  @IsEnum(TransactionType)
+  type: string;
+
+  @ApiProperty({
+    example: 5000,
+    description: 'The amount of the transaction',
+  })
+  @IsNumber()
+  amount: number;
+
+  @ApiProperty({
+    example: 1,
+    description: 'The ID of the category associated with the transaction',
+  })
+  @IsNumber()
+  category: number;
+}
 
 class PaginationMetaDto {
   @ApiProperty({ example: 1, description: 'Current page number' })

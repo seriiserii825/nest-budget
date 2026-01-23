@@ -1,4 +1,4 @@
-import { ApiProperty, PickType } from '@nestjs/swagger';
+import { ApiProperty, OmitType, PickType } from '@nestjs/swagger';
 import { IsEnum, IsNumber, IsString } from 'class-validator';
 import { CategoryDto } from 'src/category/dto/create-category.dto';
 import { UserResponseDto } from 'src/user/dto/user-response-dto';
@@ -63,6 +63,11 @@ export class TransactionResponseDto {
   @IsString()
   updatedAt: Date;
 }
+
+export class TransactionWithoutRelationsDto extends OmitType(
+  TransactionResponseDto,
+  ['user', 'category'] as const,
+) {}
 
 export class CreateTransactionDto extends PickType(TransactionResponseDto, [
   'title',

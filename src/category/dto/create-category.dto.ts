@@ -1,5 +1,6 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { TransactionWithoutRelationsDto } from 'src/transaction/dto/create-transaction.dto';
 
 export class CategoryDto {
   @ApiProperty({ example: 1, description: 'The ID of the category' })
@@ -34,3 +35,11 @@ export class CategoryDto {
 export class CreateCategoryDto extends PickType(CategoryDto, [
   'title',
 ] as const) {}
+
+export class CategoryWithRelationsDto extends CategoryDto {
+  @ApiProperty({
+    type: [TransactionWithoutRelationsDto],
+    description: 'List of transactions associated with the category',
+  })
+  transaction: TransactionWithoutRelationsDto[];
+}

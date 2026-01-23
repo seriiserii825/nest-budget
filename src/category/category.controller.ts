@@ -9,7 +9,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { CategoryDto, CreateCategoryDto } from './dto/create-category.dto';
+import {
+  CategoryDto,
+  CategoryWithRelationsDto,
+  CreateCategoryDto,
+} from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
@@ -35,6 +39,14 @@ export class CategoryController {
   @Get()
   findAll(@CurrentUser() user: IUserFromJwt): Promise<CategoryDto[]> {
     return this.categoryService.findAll(user.userId);
+  }
+
+  @ApiOkResponse({ type: [CategoryWithRelationsDto] })
+  @Get('with-transactions')
+  findAllWithTransactions(
+    @CurrentUser() user: IUserFromJwt,
+  ): Promise<CategoryWithRelationsDto[]> {
+    return this.categoryService.findAllWithTransactions(user.userId);
   }
 
   @ApiOkResponse({ type: CategoryDto })
